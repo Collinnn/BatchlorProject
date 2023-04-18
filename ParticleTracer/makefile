@@ -1,6 +1,6 @@
 IDIR = include
-CC=gcc
-CFLAGS=-I$(IDIR) -Wall -O3 #-01 -02 -03 -
+CC=g++
+CFLAGS=-I$(IDIR) -Wall  #-01 -02 -03 -
 
 ODIR=obj
 LDIR =lib
@@ -12,13 +12,13 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 _OBJ = main.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
-VPATH = SRC INCDIR
-	
+
+
 main: $(OBJ)
 	$(CC) -o  main $^ $(CFLAGS) $(LIBS)
 	
 
-$(OBJ): $(ODIR)/%.o: %.c $(DEPS)
+$(OBJ): $(ODIR)/%.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 
