@@ -35,7 +35,7 @@ int gravtiationalForceUpdate(int x,int y){
         for (int j = 0; j < 1000; j++)
         {
                 particle2D temp = particleArr[x+y*1000];
-                double distance = sqrt(temp.x*temp.x+temp.y*temp.y);
+                double distance = sqrt(abs(temp.x-input.x+temp.y-input.y));
                 double force = G*temp.weight*input.weight/(distance*distance);
                 double angle = atan2(input.y-temp.y,input.x-input.y);
                 input.x_delta += force*cos(angle);
