@@ -1,6 +1,6 @@
 IDIR = include
 CC=g++
-CFLAGS=-I$(IDIR) -Wall -g -std=c++11 #-01 -02 -03 -
+CFLAGS=-I$(IDIR) -Wall -g #-std=c++11 #-01 -02 -03 -
 
 ODIR=obj
 LDIR =lib
@@ -15,10 +15,10 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
 main: $(OBJ)
-	$(CC) -o  main $^ $(CFLAGS) $(LIBS)
+	$(CC) -o $(ODIR)/main $^ $(CFLAGS) $(LIBS)
 	
 
-$(OBJ): $(ODIR)/%.o: %.cpp $(DEPS)
+$(ODIR)/%.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 

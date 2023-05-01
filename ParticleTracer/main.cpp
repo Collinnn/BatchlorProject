@@ -9,6 +9,7 @@ particle2D particleArr[1000*1000];
 particle2D tempArr0[1000*1000];
 double G = 6.67430e-11; //Gravitational constant
 
+//Initializes the global particle array with random values
 int initArrays(){
     int length = 1000;
     
@@ -61,7 +62,7 @@ int bruteForceUpdate(){
 int PICUpdate(){
     return 0;
 }
-
+//Takes an int to choose which update method to use
 int updateArr(int type){
    if(type == 0){
      bruteForceUpdate();
@@ -78,17 +79,50 @@ int printArr(){
     {
         for (int j = 0; j < length; j++)
         {
-            printf("x: %f, y: %f, x_delta: %f, y_delta: %f, weight: %f");
+            printf("x: %f, y: %f, x_delta: %f, y_delta: %f, weight: %f", particleArr[i+j*length].x, particleArr[i+j*length].y, particleArr[i+j*length].x_delta, particleArr[i+j*length].y_delta, particleArr[i+j*length].weight);
         }
     }
     return 0;
 }
 
+//Takes the global particle array and prints it to a ppm file
+int toPPMfile(){
+    int const length = 1000;
+    FILE *fp;
+    printf("Writing to file\n");
+    fp = fopen("ParticleTracer/Output/output.ppm", "w+"); //w+ is for writing and reading
+    fprintf(fp, "P3\n%d %d\n%d\n", length, length, 255);
+    double Arr[length][length] = {0};
+    
+
+    //Adds together how many particles are in each pixel
+    for (int i = 0; i <= length; i++)
+    {
+        for (int j = 0; j < length; j++)
+        {
+            int x = particleArr[i+j*length].x;
+            int y = particleArr[i+j*length].y;
+            Arr[x][y] +=1;
+        }
+    }
+
+    //Prints the values of pixels to the file
+    for (int i = 0; i <= length; i++)
+    {
+        for (int j = 0; j < length; j++)
+        {
+            fprintf(fp, "%d %d %d ", (int)Arr[i][j], (int)Arr[i][j], (int)Arr[i][j]);
+        }
+    }
+    return 0;
+}
 
 int main(int argc, char const *argv[])
 {
+    printf("Starting programs\n");
     initArrays();
     updateArr(0);
+    toPPMfile();
     return 0;
 }
 
