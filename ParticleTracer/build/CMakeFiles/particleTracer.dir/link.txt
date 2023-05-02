@@ -1,0 +1,3 @@
+"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E rm -f CMakeFiles\particleTracer.dir/objects.a
+\MinGW\bin\ar.exe qc CMakeFiles\particleTracer.dir/objects.a @CMakeFiles\particleTracer.dir\objects1.rsp
+\mingw\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\particleTracer.dir/objects.a -Wl,--no-whole-archive -o particleTracer.exe -Wl,--out-implib,libparticleTracer.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\particleTracer.dir\linklibs.rsp
