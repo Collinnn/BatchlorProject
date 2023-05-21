@@ -1,6 +1,6 @@
 IDIR = include
 CC=g++
-CFLAGS=-I$(IDIR) -Wall #-std=c++11 #-01 -02 -03 -
+CFLAGS=-I$(IDIR) -Wall -std=c++11 #-01 -02 -03 -
 
 ODIR=obj
 LIBS= 

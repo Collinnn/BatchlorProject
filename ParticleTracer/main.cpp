@@ -3,11 +3,14 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h> 
+#include <ctime> 
 #include "./include/particle.h"
 #include <cmath>
 #include <tgmath.h>
-particle2D particleArr[100*100];
-particle2D tempArr[100*100];
+#include <random>
+const int length = 10000;
+particle2D particleArr[length];
+particle2D tempArr[length];
 double G = 6.67430e-11; //Gravitational constant
 
 
@@ -15,54 +18,50 @@ double G = 6.67430e-11; //Gravitational constant
 
 //Initializes the global particle array with random values
 int initArrays(){
-    int length = 100;
-    
-    for (int i = 0; i <= length; i++)
+    int lengthx = 100;
+    int lengthy = 100; 
+    std::mt19937 mt(time(nullptr)); 
+    for (int i = 0; i <= lengthx; i++)
     {
-        for (int j = 0; j < length; j++)
+        for (int j = 0; j < lengthx; j++)
         {
-            particleArr[i+j*length].x = i;
-            particleArr[i+j*length].y = j;
-            particleArr[i+j*length].x_delta = rand()%6-3; //Random speed values
-            particleArr[i+j*length].y_delta = rand()%6-3; //Random speed values
-            particleArr[i+j*length].weight  = rand()%3;   //Random weight
+            particle2D input = particleArr[i+j*length];
+            input.x = i;
+            input.y = j;
+            input.x_delta = mt()%6-3; //Random speed values
+            input.y_delta = mt()%6-3; //Random speed values
+            input.weight  = mt()%3;   //Random weight
+            particleArr[i+j*length] = input;
         }
     }
-
     return 0;   
 }
 
-int gravtiationalForceUpdate(int x,int y, int lengthx, int lengthy){
-    particle2D input= particleArr[x+y*100];
+int gravtiationalForceUpdate(int x){
+    particle2D input= particleArr[length];
     
-    for (int i = 0; i <= lengthx; i++)
+    for (int i = 0; i <= length; i++)
     {
-        for (int j = 0; j < lengthy; j++)
-        {
-                particle2D temp = particleArr[x+y*100];
-                double distance = (double) sqrt(abs(temp.x-input.x+temp.y-input.y));
-                double force = G*temp.weight*input.weight/(distance*distance);
-                double angle = atan2(input.y-temp.y,input.x-input.y);
-                input.x_delta += force*cos(angle);
-                input.y_delta += force*sin(angle);
-        }
+        particle2D temp = particleArr[i];
+        double distance = (double) sqrt(abs(temp.x-input.x+temp.y-input.y));
+        double force = G*temp.weight*input.weight/(distance*distance);
+        double angle = atan2(input.y-temp.y,input.x-input.y);
+        input.x_delta += force*cos(angle);
+        input.y_delta += force*sin(angle);
         
     }
     //printf("Done with particle %d, %d\n", x, y);
 
-    tempArr[x+y*100] = input;
+    tempArr[x] = input;
     return 0;
 }
 
 int bruteForceUpdate(){
-    int length = 100;
     printf("Starting to update\n");
     for (int i = 0; i <= length; i++)
     {
-        for (int j = 0; j < length; j++)
-        {
-            gravtiationalForceUpdate(i,j,length,length);
-        }
+        gravtiationalForceUpdate(i);
+        
     }
     std::copy(std::begin(tempArr), std::end(tempArr), std::begin(particleArr));
     return 0;
@@ -123,9 +122,9 @@ int toPPMfile(){
     }
     printf("Done adding\n");
     //Prints the values of pixels to the file
-    for (int i = 0; i <= 1000; i++)
+    for (int i = 0; i <= length; i++)
     {
-        for (int j = 0; j < 1000; j++)
+        for (int j = 0; j < length; j++)
         {
             printf("%d %d %d ", (int)Arr[i][j], (int)Arr[i][j], (int)Arr[i][j]);
             fout << (int)Arr[i][j] << " " << (int)Arr[i][j] << " " << (int)Arr[i][j] << "  ";
