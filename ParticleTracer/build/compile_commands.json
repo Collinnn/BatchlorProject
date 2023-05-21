@@ -1,7 +1,0 @@
-[
-{
-  "directory": "C:/Users/Tobias Collin/Documents/GitHub/BatchlorProject/ParticleTracer/build",
-  "command": "\\mingw\\bin\\g++.exe   -g -o CMakeFiles\\particleTracer.dir\\main.cpp.obj -c \"C:\\Users\\Tobias Collin\\Documents\\GitHub\\BatchlorProject\\ParticleTracer\\main.cpp\"",
-  "file": "C:/Users/Tobias Collin/Documents/GitHub/BatchlorProject/ParticleTracer/main.cpp"
-}
-]

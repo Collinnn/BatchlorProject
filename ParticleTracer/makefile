@@ -3,7 +3,7 @@ CC=g++
 CFLAGS=-I$(IDIR) -Wall #-std=c++11 #-01 -02 -03 -
 
 ODIR=obj
-LIBS= -pthread
+LIBS= 
 
 _DEPS = particle.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
@@ -12,13 +12,16 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _OBJ = main.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
+$(ODIR)/%.o: %.cpp $(DEPS)
+	$(CC) -o $@ -c $< 
+
+main:  obj/main.o
+#$(info $(CC) -o main obj/main.o)
+	$(CC) -o main obj/main.o 
+#$(CFLAGS) $(LIBS)
 
 
-main: $(OBJ)
-	$(CC) -o main $@ $^ $(CFLAGS) $(LIBS)
-
-$(OBJ): $(ODIR)/%.o: %.c $(DEPS)
-	$(CC) -cpp -o $@ $< $(CFLAGS)
+#$(CFLAGS)
 
 .PHONY: clean
 
