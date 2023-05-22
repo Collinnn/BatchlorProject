@@ -1,2 +1,7 @@
 make -f makefile
 ./main
+
+module load cuda/11.7
+module load nvhpc/22.7-nompi
+linuxsh
+sxm2sh

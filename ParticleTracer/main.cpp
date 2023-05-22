@@ -4,10 +4,11 @@
 #include <fstream>
 #include <stdlib.h> 
 #include <ctime> 
-#include "./include/particle.h"
+#include "./include/particle.hpp"
 #include <cmath>
 #include <tgmath.h>
 #include <random>
+#include <cassert>
 const int length = 10000;
 particle2D particleArr[length];
 particle2D tempArr[length];
@@ -18,27 +19,30 @@ double G = 6.67430e-11; //Gravitational constant
 
 //Initializes the global particle array with random values
 int initArrays(){
-    int lengthx = 100;
-    int lengthy = 100; 
-    std::mt19937 mt(time(nullptr)); 
-    for (int i = 0; i <= lengthx; i++)
+    int width = 100;
+    int height = 100; 
+
+    std::mt19937 gen32(0); //Standard mersenne_twister_engine seeded with rd()
+    
+    for (int i = 0; i < width; i++)
     {
-        for (int j = 0; j < lengthx; j++)
+        for (int j = 0; j < height; j++)
         {
-            particle2D input = particleArr[i+j*length];
+            assert(i+j*width<length);
+            particle2D input = particleArr[i+j*width];
             input.x = i;
             input.y = j;
-            input.x_delta = mt()%6-3; //Random speed values
-            input.y_delta = mt()%6-3; //Random speed values
-            input.weight  = mt()%3;   //Random weight
-            particleArr[i+j*length] = input;
+            input.x_delta = gen32()%6-3; //Random speed values
+            input.y_delta = gen32()%6-3; //Random speed values
+            input.weight  = gen32()%3;   //Random weight
+            particleArr[i+j*width] = input;
         }
     }
     return 0;   
 }
 
 int gravtiationalForceUpdate(int x){
-    particle2D input= particleArr[length];
+    particle2D input= particleArr[x];
     
     for (int i = 0; i <= length; i++)
     {
@@ -53,6 +57,7 @@ int gravtiationalForceUpdate(int x){
     //printf("Done with particle %d, %d\n", x, y);
 
     tempArr[x] = input;
+    
     return 0;
 }
 
@@ -140,12 +145,14 @@ int main(){
 
     initArrays();
     printArr();
+    /*
     printf("Updating arrays\n");
     updateArr(0);
     printf("Printing arrays to ppm\n");
     printArr();
     toPPMfile();
     printf("Done\n");
+    */
     return 0;
 }
 
