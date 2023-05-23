@@ -6,24 +6,24 @@ CC=nvc++
 CFLAGS= -I $(IDIR) -Wall -std=c++17  -Msafeptr -march=native -fopenmp -mp=gpu -mp=noautopar -gpu=fastmath -O3 -mavx -mavx2 -msse4 -gpu=cc70 #-01 -02 -03 -gpu=cc80
 
 ODIR=obj
-LIBS= 
+LIBS= -lm
 
-_DEPS = particle.hpp
+_DEPS = particleTypes.hpp particles.hpp
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-
-_OBJ = main.o
+_OBJ = main.o 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
-
 $(ODIR)/%.o: %.cpp $(DEPS)
-	$(CC) -o $@  $< $(CFLAGS)
+	$(CC) -o  $@ -c $< $(CFLAGS)
 
-
+# $@ is the left side of the " : " 
+# $^ is the right side of the " : "
 
 main: $(OBJ)
-	$(CC) -o main obj/main.o $(CFLAGS) $(LIBS)
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
 
 
 .PHONY: clean

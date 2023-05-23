@@ -6,4 +6,7 @@ class fields{
     std::vector<double> data;
     size_t width, height;
 
+    double * bilinearInterpolateFields(double x, double y);
+    double FEMFields();
+
 };
