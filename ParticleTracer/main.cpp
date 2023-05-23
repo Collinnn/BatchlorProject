@@ -4,25 +4,25 @@
 #include <fstream>
 #include <stdlib.h> 
 #include <ctime> 
-#include "./include/particle.hpp"
+#include "./include/particleTypes.hpp"
 #include <cmath>
 #include <tgmath.h>
 #include <random>
 #include <cassert>
+
 const int length = 10000;
 particle2D particleArr[length];
 particle2D tempArr[length];
 double G = 6.67430e-11; //Gravitational constant
 
 
-
-
-//Initializes the global particle array with random values
 int initArrays(){
     int width = 100;
     int height = 100; 
 
-    std::mt19937 gen32(0); //Standard mersenne_twister_engine seeded with rd()
+    std::mt19937 gen32(0); //Standard mersenne_twister_engine seeded with 0
+    std::uniform_real_distribution<double> dist{0.0, 1.0}; //Random double between 0 and 1
+    std::uniform_real_distribution<double> dist2{-2.0, 2.0};
     
     for (int i = 0; i < width; i++)
     {
@@ -30,16 +30,17 @@ int initArrays(){
         {
             assert(i+j*width<length);
             particle2D input = particleArr[i+j*width];
-            input.x = i;
-            input.y = j;
-            input.x_delta = gen32()%6-3; //Random speed values
-            input.y_delta = gen32()%6-3; //Random speed values
-            input.weight  = gen32()%3;   //Random weight
+            input.x = gen32()%width;
+            input.y = gen32()%height;
+            input.x_delta = dist2(gen32); //Random speed values
+            input.y_delta = dist2(gen32); //Random speed values
+            input.weight  = dist(gen32);   //Random weight 0-1
             particleArr[i+j*width] = input;
         }
     }
     return 0;   
 }
+
 
 int gravtiationalForceUpdate(int x){
     particle2D input= particleArr[x];
@@ -47,17 +48,31 @@ int gravtiationalForceUpdate(int x){
     for (int i = 0; i <= length; i++)
     {
         particle2D temp = particleArr[i];
-        double distance = (double) sqrt(abs(temp.x-input.x+temp.y-input.y));
-        double force = G*temp.weight*input.weight/(distance*distance);
-        double angle = atan2(input.y-temp.y,input.x-input.y);
-        input.x_delta += force*cos(angle);
-        input.y_delta += force*sin(angle);
-        
+        double xdiff = input.x-temp.x;
+        double ydiff = input.y-temp.y;
+        double distance = (double) sqrt(abs(xdiff*xdiff+ydiff*ydiff)); //Distance between two particles, done right
+        double force = G*temp.weight*input.weight/(distance*distance); //Force between two particles
+        double acceleration = force/input.weight; //Acceleration of the particle
+        double xc = xdiff/distance; //Cosine of the angle between the two particles
+        double yc = ydiff/distance; //Sine of the angle between the two particles
+        input.x_delta -= acceleration*xc;
+        input.y_delta -= acceleration*yc;
     }
     //printf("Done with particle %d, %d\n", x, y);
 
     tempArr[x] = input;
     
+    return 0;
+}
+
+int updateToNewCordinates(){
+    for (int i = 0; i <= length; i++)
+    {
+        particle2D temp = particleArr[i];
+        temp.x += temp.x_delta;
+        temp.y += temp.y_delta;
+        tempArr[i] = temp;
+    }
     return 0;
 }
 
@@ -68,6 +83,9 @@ int bruteForceUpdate(){
         gravtiationalForceUpdate(i);
         
     }
+    updateToNewCordinates();
+
+     
     std::copy(std::begin(tempArr), std::end(tempArr), std::begin(particleArr));
     return 0;
 }
@@ -86,54 +104,55 @@ int updateArr(int type){
 
     return 0;
 }
+
 int printArr(){
-    int length = 100;
     for (int i = 0; i <= length; i++)
     {
-        for (int j = 0; j < length; j++)
-        {
-            printf("x: %f, y: %f, x_delta: %f, y_delta: %f, weight: %f", particleArr[i+j*length].x, particleArr[i+j*length].y, particleArr[i+j*length].x_delta, particleArr[i+j*length].y_delta, particleArr[i+j*length].weight);
-        }
+        printf("x: %f, y: %f, x_delta: %f, y_delta: %f, weight: %f \n", particleArr[i].x, particleArr[i].y, particleArr[i].x_delta, particleArr[i].y_delta, particleArr[i].weight);
+        //printf("weight: %f", particleArr[i].weight);
     }
     return 0;
 }
 
 //Takes the global particle array and prints it to a ppm file
 int toPPMfile(){
-
-    int const length = 100;
-    std::ofstream fout("output.ppm");
+    int height = 100;
+    int width = 100;
+    std::remove("./Output/output.ppm");
+    std::ofstream fout("./Output/output.ppm");
     if(fout.fail()){
         std::cout << "Error opening file" << std::endl;
         return -1;
     }
 
     fout << "P3\n";
-    fout << length << " " << length << "\n";
+    fout << height << " " << width << "\n";
     fout << "255\n";
 
-    double Arr[1000][1000] = {0};
-    
+    double Arr[length] = {0};
+    int x = 0;
+    int y = 0;
+    int z = 0;
+
 
     //Adds together how many particles are in each pixel
-    for (int i = 0; i <= length; i++)
+    for (int i = 0; i < length; i++)
     {
-        for (int j = 0; j < length; j++)
-        {
-            int x = particleArr[i+j*length].x;
-            int y = particleArr[i+j*length].y;
-            Arr[x][y] +=1;
+        assert(particleArr[i].x==tempArr[i].x);
+        x = particleArr[i].x;
+        y = particleArr[i].y;
+        z= x+y*width;
+        if(z<length && z>0){
+            Arr[z] +=1;
         }
+       
     }
     printf("Done adding\n");
     //Prints the values of pixels to the file
-    for (int i = 0; i <= length; i++)
+    for (int i = 0; i < length; i++)
     {
-        for (int j = 0; j < length; j++)
-        {
-            printf("%d %d %d ", (int)Arr[i][j], (int)Arr[i][j], (int)Arr[i][j]);
-            fout << (int)Arr[i][j] << " " << (int)Arr[i][j] << " " << (int)Arr[i][j] << "  ";
-        }
+        printf("%d %d %d ", (int)Arr[i]*10, (int)Arr[i]*10, (int)Arr[i]*10);
+        fout << (int)Arr[i]*10 << " " << (int)Arr[i]*10 << " " << (int)Arr[i]*10 << "  ";
     }
     fout.close();
     return 0;
@@ -145,14 +164,14 @@ int main(){
 
     initArrays();
     printArr();
-    /*
+    
     printf("Updating arrays\n");
     updateArr(0);
     printf("Printing arrays to ppm\n");
     printArr();
     toPPMfile();
     printf("Done\n");
-    */
+    
     return 0;
 }
 
