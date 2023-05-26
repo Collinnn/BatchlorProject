@@ -24,7 +24,7 @@ class field{
     //Copy assignment operator, deep copy
     field<T> copy() const;
 
-    double * bilinearInterpolateFields(double x, double y);
+    double* bilinearInterpolateFields(double x, double y);
 
 
     private:
@@ -38,7 +38,7 @@ field<T>::field() : width(0),heigh(0),data(){}
 template <typename T>
 field<T>::field(size_t width_v, size_t height_v) : width(width_v), height(height_v), data().resize(width*height){}
 
-template <typename T>
+template <typename T> //Error why?
 field<T>::field(field<T>&& other) noexcept : width(other.width),height(other.height),data(std::move(other.data)){}
 
 template <typename T>
@@ -61,4 +61,30 @@ field<T> field<T>::copy() const{
         new_field[i] = data[i];
     }
     return new_field;
+}
+
+//Should be moved to a separate file which handles the conversion from field to 
+template <typename T>
+double* field<T>::bilinearInterpolateFields(double x, double y){
+    //Corners for an point
+    double x1 = floor(x);
+    double x2 = ceil(x);
+    double y1 = floor(y);
+    double y2 = ceil(y);
+
+    double divided = (x2-x1)*(y2-y1);
+    if(divided==0.0){
+        return new double[4]{0.0,0.0,0.0,0.0}; 
+    }
+    //Distances from the corners
+    double x2x = x2-x;
+    double xx1 = x-x1;
+    double y2y = y2-y;
+    double yy1 = y-y1;
+    //Interpolation weights
+    double w11 = (x2x)*(y2y)/divided;
+    double w12 = (x2x)*(yy1)/divided;
+    double w21 = (xx1)*(y2y)/divided;
+    double w22 = (xx1)*(yy1)/divided;
+    return new double[4]{w11,w12,w21,w22};
 }
