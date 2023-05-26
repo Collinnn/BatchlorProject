@@ -49,7 +49,9 @@
         "typeindex": "cpp",
         "typeinfo": "cpp",
         "cassert": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "algorithm": "cpp",
+        "iterator": "cpp"
     },
     "cmake.configureOnOpen": false
 }
