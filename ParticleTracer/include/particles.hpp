@@ -1,105 +1,45 @@
 #pragma once
 
 #include "./particleTypes.hpp"
+#include "./grid.hpp"
 #include <algorithm>
 #include <iterator>
 #include <stdlib.h>
+#include <memory>
+#include "util.hpp"
 
-class particles
-{
 
-private:
-    static const int length = 10000;
-    static particle2D particleArr[length];
-    
-    //omp_target_alloc(particleArr, 10000*sizeof(particle2D), omp_get_default_device());
-    // The above outcommented needs mapping to CPU
-public:
-    static int getLength(){return length;}
-    static particle2D* getParticleArray(){return particleArr;}
-    static particle2D getParticleArrayValue(int i){return particleArr[i];}
-    static void setParticleArrayValue(int i, particle2D& value){particleArr[i] = value;}
-    static void setParticleArray(particle2D* value){for (int i = 0; i < length; i++){particleArr[i] = value[i];}}
-    
-};
-
-//Allocates memory for the static array
-particle2D particles::particleArr[length];
-template <typename T>
-class ParticlesTemplated
-{
-    ParticlesTemplated();
-    ParticlesTemplated(size_t num_particles);
-    ~ParticlesTemplated();
-
-    ParticlesTemplated(ParticlesTemplated& other) = delete; //Copy constructor deleted
-    ParticlesTemplated(ParticlesTemplated&& other) noexcept; //Move constructor
-    ParticlesTemplated<T>& operator=(ParticlesTemplated<T>&&) noexcept; //Move assignment operator
-
-    inline T& operator[](int i){return data_ptr[i];} //get value at index
-    inline const T& operator[](int i) const {return data_ptr[i];} //get value at index
-
-    inline bool is_empty() const {return data_ptr == nullptr;}
-
-    void clear(); //Clears the data
-    void swap(ParticlesTemplated<T>& other); //Swaps the data with another ParticlesTemplated<T>
-
-    private:
-        void free(); //Frees the data, is used internally in the hpp file
-
-    private:
-    T* data_ptr;
-    //omp_target_alloc(particleArr, 10000*sizeof(particle2D), omp_get_default_device());
-    // The above outcommented needs mapping to CPU
-};
-
-template <typename T>
-ParticlesTemplated<T>::ParticlesTemplated() : data_ptr(nullptr){}
-
-template <typename T>
-ParticlesTemplated<T>::ParticlesTemplated(size_t num_particles) : data_ptr(nullptr){
-    data_ptr = new T[num_particles];
-};
-template <typename T>
-ParticlesTemplated<T>::~ParticlesTemplated(){
-   if(!is_empty()){ // data_ptr != nullptr
-       this->free();
-   }
-}
-//other data_ptr is now new pointer and old is null
-
-template <typename T>
-ParticlesTemplated<T>::ParticlesTemplated(ParticlesTemplated<T>&& other) noexcept : data_ptr(other.data_ptr){
-    other.data_ptr = nullptr;
-}
-
-template <typename T>
-ParticlesTemplated<T>& ParticlesTemplated<T>::operator=(ParticlesTemplated<T>&& other) noexcept{
-    if(this != &other){
-        if(!is_empty()){
-            this->free();
+class particle_storage{ //this stores the particles
+    public:
+        particle_storage(size_t capacity){
+            particles_ptr = new particle2D[capacity];
+            size = capacity;
+        } // num of particles
+        ~particle_storage(){
+            delete[] particles_ptr; //array delete
         }
 
-        data_ptr = other.data_ptr;
-        other.data_ptr = nullptr;
-    }
-    return *this;
-}
+        //Delete copy constructor and assignment operator
+        particle_storage(const particle_storage&) = delete;
+        particle_storage &operator=(const particle_storage&) = delete;
 
-template <typename T>
-void ParticlesTemplated<T>::clear(){
-    if(!is_empty()){
-        this->free();
-        m_ptr=nullptr;
-    }
-}
+        particle2D &operator[](size_t index){return particles_ptr[index];}
+        const particle2D &operator[](size_t index) const{return particles_ptr[index];}
 
-template <typename T>
-void ParticlesTemplated<T>::swap(ParticlesTemplated<T>& other){
-    std::swap(data_ptr, other.data_ptr);
-}
 
-template <typename T> 
-void ParticlesTemplated<T>::free(){
-    delete[] data_ptr;
-}
+        size_t getSize() const {return size;}
+    private:
+        particle2D* particles_ptr;
+        size_t size; // The number of particles in the array
+};
+
+class particle_system{
+    public:
+        particle_system(domain_info) : storage(1000){}
+        ~particle_system(){} //Works because the destructors are automatic
+        inline particle_storage& getParticleStorage(){return storage;}
+    private:
+        particle_storage storage;
+        domain_info domain;
+};
+

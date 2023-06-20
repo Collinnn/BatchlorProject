@@ -51,7 +51,9 @@
         "cassert": "cpp",
         "string": "cpp",
         "algorithm": "cpp",
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "memory": "cpp",
+        "random": "cpp"
     },
     "cmake.configureOnOpen": false
 }

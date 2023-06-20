@@ -6,7 +6,7 @@
 
 typedef struct 
 {
-    double x; //Postions
+    double x; //Positions
     double y;
     double weight; // how much does it do against other particles
     double x_delta; // accelertion movement in a certain path
