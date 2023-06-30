@@ -8,10 +8,10 @@ CFLAGS= -I $(IDIR) -Wall -std=c++17   -Msafeptr -march=native -fopenmp -mp=gpu -
 ODIR=obj
 LIBS= -lm
 
-_DEPS = particleTypes.hpp particles.hpp bruteforce.hpp util.hpp
+_DEPS = particleTypes.hpp particles.hpp bruteforce.hpp util.hpp io.hpp util.hpp
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o bruteforce.o particles.o
+_OBJ = main.o bruteforce.o particles.o io.o 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 

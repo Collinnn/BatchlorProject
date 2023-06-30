@@ -19,7 +19,15 @@ typedef struct{
     double cell_width, cell_height;
 } domain_info;
 
-typedef struct range_t {
+typedef struct{
     int start_x, start_y;
     int end_x, end_y;
 } range2D;
+
+typedef struct{
+    double totaltime;
+    double movetime, avgmovetime, maxmovetime,minmovetime;
+    double densitytime, avgdensitytime, maxdensitytime, mindensitytime;
+    double iterativetime, avgiterativetime, maxiterativetime, miniterativetime;
+    double forcetime, avgforcetime, maxforcetime, minforcetime;
+} timeZone;

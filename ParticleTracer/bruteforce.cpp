@@ -3,14 +3,15 @@
 #include "./include/particles.hpp"
 double G = 6.67430e-11; //Gravitational constant
 
-/*
-particle2D gravtiationalForceUpdate(int x,particle2D tempArr){
-    particle2D input = particles::getParticleArrayValue(x);
+
+void gravtiationalForceUpdate(int x,particle_storage& storage){
+    particle2D input = storage[x];
 
     double x_delta = input.x_delta;
     double y_delta = input.y_delta;
-    for (int i = 0; i < particles::getLength(); i++){
-        particle2D temp = particles::getParticleArrayValue(i);
+    int size = storage.getSize();
+    for (int i = 0; i < size; i++){
+        particle2D temp = storage[i];
 
         if(input.x == temp.x && input.y == temp.y){
             continue;
@@ -18,7 +19,7 @@ particle2D gravtiationalForceUpdate(int x,particle2D tempArr){
             double xdiff = input.x-temp.x;
             double ydiff = input.y-temp.y;
 
-            double distance = sqrt(abs(xdiff*xdiff+ydiff*ydiff)); //Distance between two particles, done right
+            double distance = sqrt(xdiff*xdiff+ydiff*ydiff); //Distance between two particles, done right
             if(distance == 0){
                 continue;
             }else{
@@ -33,41 +34,45 @@ particle2D gravtiationalForceUpdate(int x,particle2D tempArr){
         } 
     }
 
-    tempArr.x_delta = x_delta;
-    tempArr.y_delta = y_delta;
-    return tempArr;
+    storage[x].x_delta = x_delta;
+    storage[x].y_delta = y_delta;
+
 }
 
-int updateToNewCordinates(particle2D* tempArr){
-    particle2D* particleArr = particles::getParticleArray();
-    for (int i = 0; i < particles::getLength(); i++)
+int updateToNewCordinates(particle_storage& storage,int steps){
+    size_t size = storage.getSize();
+    //handles invalid steps
+    if(steps<=0){
+       steps =1;
+    }
+    for (int i = 0; i < size; i++)
     {
-        particle2D temp = particleArr[i];
-        temp.x += temp.x_delta;
-        temp.y += temp.y_delta;
-        tempArr[i] = temp;
+        storage[i].x += storage[i].x_delta*steps;
+        storage[i].y += storage[i].y_delta*steps;
+
     }
     return 0;
 }
-*/
 
-int bruteForceUpdate(){
-    /*
-    printf("Starting to update\n");
-    particle2D * tempArr = particles::getParticleArray();
 
-    for (int i = 0; i < particles::getLength(); i++)
+int bruteForceUpdate(particle_storage& storage){
+    size_t size = storage.getSize();
+    particle_storage tempArr(size);
+    for (int i = 0; i < size; i++)
     {
-        tempArr[i]=gravtiationalForceUpdate(i, tempArr[i]);
+        tempArr[i] = storage[i];
+    }
+    for (int i = 0; i < size; i++)
+    {
+        gravtiationalForceUpdate(i, tempArr);
     }
     
-    updateToNewCordinates(tempArr);
+    updateToNewCordinates(tempArr,1);
 
-    for (int i = 0; i < particles::getLength(); i++)
+    for (int i = 0; i < size; i++)
     {
-        particles::setParticleArrayValue(i,tempArr[i]);
+        storage[i] = tempArr[i];
     }
-    particles::setParticleArray(tempArr);
-    */
+    tempArr.~particle_storage(); //Delete the temporary array 
     return 0;
 }

@@ -25,13 +25,18 @@ class particle_storage{ //this stores the particles
 
         particle2D &operator[](size_t index){return particles_ptr[index];}
         const particle2D &operator[](size_t index) const{return particles_ptr[index];}
-
+        inline particle2D* copy() const;
 
         size_t getSize() const {return size;}
     private:
         particle2D* particles_ptr;
         size_t size; // The number of particles in the array
 };
+particle2D* particle_storage::copy() const {
+    particle2D* new_particles = new particle2D[size];
+    std::copy(particles_ptr, particles_ptr + size, new_particles);
+    return new_particles;
+}
 
 class particle_system{
     public:

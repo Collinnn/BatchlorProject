@@ -8,13 +8,13 @@ class grid{
     grid(size_t width, size_t height): width(width), height(height),data(width*height){
 
     };
-    grid(const grid& other) : width(other.width), height(other.height), data(other.data) {}
+    //grid(const grid& other) : width(other.width), height(other.height), data(other.data) {}
     ~grid(){} //Destructor
 
-    //grid(const grid &) = delete; THIS MIGHT BE BIG TROUBLE
+    grid(const grid &) = delete; 
     grid &operator=(const grid &) = delete;    
     
-
+    grid(const grid&& ); 
     grid &operator=(grid<T>&& other) noexcept; //Move assignment operator
 
     T& operator[](int i){return data[i];} //get value at index
@@ -32,6 +32,8 @@ class grid{
     size_t width, height;
 };
 
+template <typename T>
+grid<T>::grid(const grid<T>&& other): width(other.width), height(other.height), data(std::move(other.data)){}
 
 template <typename T>
 grid<T>& grid<T>::operator=(grid<T>&& other) noexcept{
