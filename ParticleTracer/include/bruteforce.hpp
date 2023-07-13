@@ -1,3 +1,3 @@
 #pragma once
 
-int bruteForceUpdate();
+int bruteForceUpdate(particle_storage& storage); 

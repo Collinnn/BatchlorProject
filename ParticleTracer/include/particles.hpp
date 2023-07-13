@@ -40,7 +40,7 @@ particle2D* particle_storage::copy() const {
 
 class particle_system{
     public:
-        particle_system(domain_info) : storage(1000){}
+        particle_system(domain_info,int amount) : storage(amount){}
         ~particle_system(){} //Works because the destructors are automatic
         inline particle_storage& getParticleStorage(){return storage;}
     private:
