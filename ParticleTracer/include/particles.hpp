@@ -7,15 +7,21 @@
 #include <stdlib.h>
 #include <memory>
 #include "util.hpp"
-
+#define MY_DEBUG
 
 class particle_storage{ //this stores the particles
     public:
         particle_storage(size_t capacity){
             particles_ptr = new particle2D[capacity];
+            #ifdef MY_DEBUG
+            printf("Construct particle %p \n",particles_ptr);
+            #endif
             size = capacity;
         } // num of particles
         ~particle_storage(){
+            #ifdef MY_DEBUG
+            printf("Deleted particle %p \n",particles_ptr);
+            #endif
             delete[] particles_ptr; //array delete
         }
 

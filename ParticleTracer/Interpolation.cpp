@@ -7,7 +7,7 @@
 #include "./include/grid.hpp"
 #include "./include/util.hpp"
 #include "./include/gravitationalField2D.hpp"
-
+#define MY_DEBUG
 
 std::vector<double> data;
 

@@ -1,7 +1,7 @@
 #include "./include/particles.hpp"
 #include "./include/particleTypes.hpp"
 #pragma once
-
+#define MY_DEBUG
 void get_density(const particle_storage &particles, grid<double> &density){
     size_t stride = density.getWidth();
     

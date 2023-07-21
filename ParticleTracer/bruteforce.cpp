@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "./include/particleTypes.hpp"
 #include "./include/particles.hpp"
+#define MY_DEBUG
 double G = 6.67430e-11; //Gravitational constant
 
 

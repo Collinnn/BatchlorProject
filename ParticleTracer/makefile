@@ -10,7 +10,7 @@ OUT=Output
 ODIR=obj
 LIBS= -lm
 
-_DEPS = particleTypes.hpp particles.hpp bruteforce.hpp util.hpp io.hpp util.hpp
+_DEPS = particleTypes.hpp particles.hpp bruteforce.hpp util.hpp io.hpp util.hpp poissonSolver.hpp
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 _OBJ = main.o bruteforce.o particles.o io.o 
@@ -19,6 +19,8 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.cpp $(DEPS)
 	$(CC) -o  $@ -c $< $(CFLAGS)
+
+
 
 # $@ is the left side of the " : " 
 # $^ is the right side of the " : "

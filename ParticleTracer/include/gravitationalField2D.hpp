@@ -10,7 +10,7 @@ class gravitationalField2D{
     public:
         //Constructors
         //The +2 is to make it 2 larger than needed, this makes the jacobi solver easier
-        gravitationalField2D(domain_info domain): density_map((domain.width/domain.cell_width)+2,(domain.height/domain.cell_height)+2), potential_map(domain.width/domain.cell_width,domain.height/domain.cell_height){};
+        gravitationalField2D(domain_info domain): density_map((domain.width/domain.cell_width),(domain.height/domain.cell_height)), potential_map(domain.width/domain.cell_width,domain.height/domain.cell_height){};
         ~gravitationalField2D(){}; //Destructor
 
         gravitationalField2D(gravitationalField2D& other) = delete; //Copy constructor deleted
@@ -25,4 +25,5 @@ class gravitationalField2D{
         grid<double> potential_map; 
 };
 
+ 
 
