@@ -12,7 +12,7 @@
 #include "./include/bruteforce.hpp"
 #include "./include/util.hpp"
 #include "./include/io.hpp"
-
+#include "./include/poissonSolver.hpp"
 #include <cmath>
 #include <tgmath.h>
 #include <random>
@@ -20,7 +20,7 @@
 #include <vector>
 #include <omp.h>
 #include <float.h>
-//#define MY_DEBUG
+#define MY_DEBUG
 // export OMP_NUM_THREADS= 4
 
 int initParticles(domain_info& domain, particle_storage &storage){
@@ -37,7 +37,9 @@ int initParticles(domain_info& domain, particle_storage &storage){
     for (int i = 0; i < size; i++)
     {   
         #ifdef MY_DEBUG
-        assert(i>0&&i<size);
+        printf("i is %d \n",i);
+        printf("size is %d \n",size);
+        assert(i>=0&&i<size);
         #endif
 
         particle2D input; //here
@@ -49,7 +51,6 @@ int initParticles(domain_info& domain, particle_storage &storage){
 
         storage[i] = input;
         particle2D& particle = storage[i]; 
-        //printf("x is %f, y is %f, x_delta is %f, y_delta is %f, weight is %f \n",particle.x,particle.y,particle.x_delta,particle.y_delta,particle.weight);
     }
     return 0;   
 }
@@ -58,7 +59,7 @@ void init2Particles(domain_info& domain,particle_storage& storage){
     storage[0].y = 50;
     storage[0].x_delta = 0;
     storage[0].y_delta = 0;
-    storage[0].weight = 500;
+    storage[0].weight = 500000000;
     storage[1].x = 60;
     storage[1].y = 50;
     storage[1].x_delta = 0;
@@ -75,170 +76,140 @@ void moveParticles(domain_info& domain, particle_storage& particle,bool& outboun
 
         //Should nearly always succeed which leads to the pipeline not being emptied at failed if
         if(x_delta<domain.width || x_delta>=0 || y_delta<domain.height || y_delta>=0){
-            
             particle[i].x += x_delta;
             particle[i].y += y_delta;
+
             continue; //skips rest of loop
         }
         outbounds = true;
         printf("out of bounds, x is %f, y is %f, index is %d \n",x_delta,y_delta,i);
-        //return;
     }
 }
 void setGridToZero(grid<double>& grid){
+    #ifdef MY_DEBUG
+    printf("setGridToZero start \n");
+    #endif
     size_t width = grid.getWidth();
     size_t height = grid.getHeight();
     for(int x = 0; x<width;x++){
         for(int y = 0;y<height;y++){
-            int index = y*width+x;
-            grid[index] = 0;
+            grid.get(x,y)= 0;
         }
     }
+    #ifdef MY_DEBUG
+    printf("setGridToZero end \n");
+    #endif
 }
 
-void getDensity(domain_info& domain,range2D& range,particle_storage& storage,gravitationalField2D& solver){
+void getDensity(domain_info& domain,poissonSolver& pSolver,particle_storage& storage,gravitationalField2D& Field2D){
+    #ifdef MY_DEBUG
+    printf("getDensity start \n");
+    #endif
     double G = 6.67430e-11; // gravitational constant
 
-    
-    grid<double>& density = solver.getDensityMap();
-    grid<double>& f = solver.getPotentialMap();
+    grid<double>& density = Field2D.getDensityMap();
+    grid<double>& potential = Field2D.getPotentialMap();
     setGridToZero(density);
-    setGridToZero(f);
+    setGridToZero(potential);
 
     double dx = domain.cell_width;
     double dy = domain.cell_height;
     int width = density.getWidth();
     int height = density.getHeight();
     int size = width*height;
+    printf("looping over particles\n");
     for(int i = 0; i<storage.getSize();i++){
 
         const particle2D& particle = storage[i];
 
-        int cell_x = (int) (particle.x/dx)+range.start_x; 
-        int cell_y = (int) (particle.y/dy)+range.start_y;
-        int index = cell_y * width + cell_x;
-        if(index<size-1 && index>0){
+        int cell_x = (int) (particle.x/dx); 
+        int cell_y = (int) (particle.y/dy);
+        if(width>cell_x && height>cell_y && cell_x>=0 && cell_y>=0){
             //Add the weight of the particles
-            density[index] += particle.weight; //Starts at zero
+            density.get(cell_x,cell_y) += particle.weight; //Starts at zero
         }
-        else{
-            
-        }
+
     }
     int kx =2*M_PI;
     int ky =4*M_PI;
-
-    for(int x= range.start_x; x<range.end_x;x++){
-        for(int y=range.start_y;y<range.end_y;y++){
-            int index = y*width+x;
+    #ifdef MY_DEBUG
+    printf("looping over rhs\n");
+    #endif
+    for(int x= 0; x<width;x++){
+        for(int y=0;y<height;y++){
             //Right side of Poisson equation
-            f[index] = kx*kx*ky*ky*sin(kx*x)*sin(ky*y); //analytical solution
-            //f[index] = 4*M_PI*G*density[index];
+            //pSolver.getF(x,y) = -kx*kx*sin(x*kx) - ky*ky*sin(y*ky); //analytical solution
+
+            pSolver.getF(x,y) = 4*M_PI*G*density.get(x,y);
         }
     }
- 
+    #ifdef MY_DEBUG
+    printf("getDensity end \n");
+    #endif
 }
 
 
 
-
-double poissonSolver(grid<double>& u,grid<double>& u_old, const grid<double>& f,double hh, size_t limit,range2D& range,double error){
-    size_t width = u.getWidth();
-    size_t height = u.getHeight();
-    size_t size = height*width;
-
-
-    for(int i = 0; i<limit;i++){
-        
-        //Reduction is a shared memory operation with the + saying after the loop add
-        //Collapse is a loop optimization to combine two loops 
-        #pragma omp parallel for collapse(2) reduction(+:error)
-        for(int x=range.start_x; x<range.end_x;x++){
-            for(int y=range.start_y;y<range.end_y;y++){
-                int index = y*width+x;
-                u[index] = 0.25*(u_old[index-1]+u_old[index+1]+u_old[index-width]+u_old[index+width]+hh*f[index]);
-                
-                if(i%5!=0){
-                    continue;
-                }else{
-                    error += abs(u[index] - u_old[index]);
-                }
-                
-            }
-        }
-        if(i%5!=0){
-            continue;
-        }else{
-            error/= size;
-        }
-        
-        #pragma omp parallel for collapse(2) reduction(+:error)
-        for(int x=1; x<width-1;x++){
-            for(int y=1;y<height-1;y++){
-                int index = y*width+x;
-                u_old[index] = 0.25*(u[index-1]+u[index+1]+u[index-width]+u[index+width]+hh*f[index]);
-                error+= u[index] - u_old[index];
-                if(i%5!=0){
-                  continue;
-                }else{
-                    error += abs(u[index] - u_old[index]);
-                }
-            }
-           
-        }
-    }
-    return error;
-}
-
-double iterativeJacobi(domain_info& domain,gravitationalField2D& field, size_t limit,range2D& range,double error){
+double iterativeJacobi(domain_info& domain,gravitationalField2D& field,poissonSolver& pSolver,int& iterations,double& tolerance){
     int hh = (domain.cell_height*domain.cell_height)*(domain.cell_height*domain.cell_height);    
-    grid<double>& u = field.getDensityMap();
-    grid<double>& f = field.getPotentialMap();
-    grid<double> u_old = std::move(u.copy());
+    grid<double>& density = field.getDensityMap();
+    grid<double>& potential = field.getPotentialMap();
+    int width = domain.width;
+    int height = domain.height;
+    double error = pSolver.solve(iterations,tolerance);
+    int us=0;
+    for(int x = 0; x<width;x++){
+        for(int y = 0;y<height;y++){
+            //printf("u is %f \n",pSolver.getU(x,y));
+            potential.get(x,y) = pSolver.getU(x,y);
 
-    error = poissonSolver(u,u_old,f,hh,limit,range,error);
+            //printf("potential is %f \n",potential.get(x,y));
+        }
+    }
+
+
     return error;
 }
 
-void updateforce(domain_info& domain, particle_storage& particles,gravitationalField2D& solver){
-    grid<double>& potential = solver.getPotentialMap();
+void updateforce(domain_info& domain, particle_storage& particles,gravitationalField2D& Field2D){
+    #ifdef MY_DEBUG
+    printf("updateforce start\n");
+    #endif
+    grid<double>& potential = Field2D.getPotentialMap();
     int width = potential.getWidth();
     int height = potential.getHeight();
     int size = width*height;
-    double force;
-    double distance,xdiff,ydiff,acceleration,xc,yc;
+    double forcex,forcey;
     size_t particle_size = particles.getSize();
-    int offset = 1; //TODO: make this a parameter
+    
+    #ifdef MY_DEBUGs
+    for(int i=0;i<size;i++){
+        if(potential[i]>0){
+            printf("potential is %f \n",potential[i]);
+        }
+        
+    }
+    #endif
     for(int i = 0; i<particle_size;i++){
         // offset is 1 to account for the -1 to 1 grid
         particle2D& particle = particles[i];
-        int cell_x = (int) (particle.x/domain.cell_width)+offset; 
-        int cell_y = (int) (particle.y/domain.cell_height)+offset;
-        int index = cell_y * width + cell_x;
-
-        if(index <size-1 && index>0){
-            force = potential[index];
-
-            xdiff = particle.x - cell_x*domain.cell_width;
-            ydiff = particle.y - cell_y*domain.cell_height;
-
-            if(xdiff != 0 || ydiff != 0){
-                distance = sqrt(xdiff*xdiff+ydiff*ydiff);
-
-                acceleration = force/particle.weight;
-
-
-
-                xc = xdiff/distance;
-                yc = ydiff/distance;
-
-                particle.x_delta += acceleration*xc;
-                particle.y_delta += acceleration*yc;
-
-
+        int cell_x = (int) (particle.x/domain.cell_width); 
+        int cell_y = (int) (particle.y/domain.cell_height);
+        if(cell_x<width && cell_y<height && cell_x>0 && cell_y>0){
+            forcex = potential.get(cell_x+1,cell_y)-potential.get(cell_x-1,cell_y);
+            forcey = potential.get(cell_x,cell_y+1)-potential.get(cell_x,cell_y-1);
+            if(forcex>0.00001 ||forcey>0.00001){
+                printf("force is %f,%f \n",forcex,forcey);
             }
+            
+            particle.x_delta += forcex;
+            particle.y_delta += forcey;
         }
     }
+
+    #ifdef MY_DEBUG
+    printf("updateforce end\n");
+    #endif
 }
 
 void initRangeAndDomain(range2D& range,domain_info& domain){
@@ -265,29 +236,37 @@ void printDomainInfo(domain_info& domain){
 }
 
 int main(){
+
+    //Inititalize variables
     domain_info domain = {};
     range2D range = {};
     timeZone time = {};
     initTime(time);
     initRangeAndDomain(range,domain);
+
     printf("Max number of threads is %d \n",omp_get_max_threads());
     
-    
     printDomainInfo(domain);
-
+    
     int amount = 2;
-    //particle_system particles(domain,amount);
     particle_storage storage(amount);
-    gravitationalField2D solver(domain);
+    gravitationalField2D Field2D(domain);
+    poissonSolver poissonSolver(domain);
 
+
+    //Variables for simulation
     bool bruteForce = false;
     bool outbounds = false;
     bool running = true;
     int max = 10; 
     int iteration = 0;
-    double steps = 0.01;
-    double error = 0;
+    int PoissonIterations = 0;
     int iter = 0;
+    double steps = 1;
+    double tolerance = 0.0001;
+    double error = 0;
+
+
     //timestep instead of iteration
     //Find max value of delta and use that to find the number of timesteps between simulation loop
     
@@ -295,8 +274,8 @@ int main(){
     
     initParticles(domain,storage);
     init2Particles(domain,storage);
-    setGridToZero(solver.getDensityMap());
-    setGridToZero(solver.getPotentialMap());
+    setGridToZero(Field2D.getDensityMap());
+    setGridToZero(Field2D.getPotentialMap());
 
     toPPMfile(domain,storage,iter);
     while(running && max-1>iteration){
@@ -305,14 +284,15 @@ int main(){
         moveParticles(domain,storage,outbounds,steps);
         toPPMfile(domain,storage,iter);
         //Time calculations
-        double moveTime = omp_get_wtime() - time.movetime;
-        if(moveTime>time.maxmovetime){
-            time.maxmovetime = moveTime;
-        }else if (moveTime<time.minmovetime){
-            time.minmovetime = moveTime;
-        }
-        time.movetime = moveTime;
+        time.movetime = omp_get_wtime() - time.movetime;
         time.avgmovetime = (time.avgmovetime*iteration+time.movetime)/(iteration+1);
+        if(time.movetime>time.maxmovetime){
+            time.maxmovetime = time.movetime;
+        }else if (time.movetime<time.minmovetime){
+            time.minmovetime = time.movetime;
+        }
+
+       
         
         
         if(bruteForce){
@@ -321,9 +301,10 @@ int main(){
             printf("getting density\n");
             //Compute the density
             time.densitytime = omp_get_wtime();
-            getDensity(domain,range,storage,solver);
+            getDensity(domain,poissonSolver,storage,Field2D);
             //Time calculations
             time.densitytime = omp_get_wtime() - time.densitytime;
+            time.avgdensitytime = (time.avgdensitytime*iteration+time.densitytime)/(iteration+1);
             if(time.densitytime>time.maxdensitytime){
                 time.maxdensitytime = time.densitytime;
             }else if (time.densitytime<time.mindensitytime){
@@ -331,9 +312,11 @@ int main(){
             }
 
             time.iterativetime = omp_get_wtime();
-            error = iterativeJacobi(domain,solver,100,range,error);
+            error = iterativeJacobi(domain,Field2D,poissonSolver,PoissonIterations,tolerance);
             time.iterativetime = omp_get_wtime() - time.iterativetime;
+            time.avgiterativetime = (time.avgiterativetime*iteration+time.iterativetime)/(iteration+1);
             printf("error: %f\n",error);
+            printf("iterations: %d\n",PoissonIterations);
             if(time.iterativetime>time.maxiterativetime){
                 time.maxiterativetime = time.iterativetime;
             }else if (time.iterativetime<time.miniterativetime){
@@ -341,10 +324,9 @@ int main(){
             }
 
             time.forcetime = omp_get_wtime();
-            printf("updating force\n");
-            updateforce(domain,storage,solver);
-
+            updateforce(domain,storage,Field2D);
             time.forcetime = omp_get_wtime() - time.forcetime;
+            time.avgforcetime = (time.avgforcetime*iteration+time.forcetime)/(iteration+1);
             if(time.forcetime>time.maxforcetime){
                 time.maxforcetime = time.forcetime;
             }else if (time.forcetime<time.minforcetime){
@@ -357,7 +339,7 @@ int main(){
     }
     time.totaltime = omp_get_wtime() - time.totaltime;
     toCSVfile(time);
-    
+    printf("Hello");
     toPPMfile(domain,storage,iter);
     //printf("Done\n");
 
