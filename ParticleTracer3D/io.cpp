@@ -6,7 +6,7 @@
 #include "./include/util.hpp"
 #include <cassert>
 #include <algorithm>
-#define MY_DEBUG
+//#define MY_DEBUG
 
 //Takes the global particle array and prints it to a ppm file
 int toPPMfile(domain_info& domain, particle_storage& storage,int& iter){
@@ -73,15 +73,16 @@ void toCSVfile(timeZone& time){
     }
     fout << "Time, AverageTime,MaxTime,MinTime\n";
     fout << time.totaltime << "\n";
-    fout << time.movetime << "," << time.avgmovetime << "," << time.maxmovetime << "," << time.minmovetime << "," << time.totalmovetime << "\n";
-    fout << time.densitytime << "," << time.avgdensitytime << "," << time.maxdensitytime << "," << time.mindensitytime << "," << time.totaldensitytime << "\n";
-    fout << time.iterativetime << "," << time.avgiterativetime << "," << time.maxiterativetime << "," << time.miniterativetime << "," << time.totaliterativetime <<"\n";
-    fout << time.forcetime << "," << time.avgforcetime << "," << time.maxforcetime << "," << time.minforcetime << "," << time.totalforcetime << "\n";
+    fout << time.movetime << "," << time.avgmovetime << "," << time.maxmovetime << "," << time.minmovetime << "\n";
+    fout << time.densitytime << "," << time.avgdensitytime << "," << time.maxdensitytime << "," << time.mindensitytime << "\n";
+    fout << time.iterativetime << "," << time.avgiterativetime << "," << time.maxiterativetime << "," << time.miniterativetime << "\n";
+    fout << time.forcetime << "," << time.avgforcetime << "," << time.maxforcetime << "," << time.minforcetime << "\n";
     printf("Time: %f\n", time.totaltime);
-    printf("MoveTime: %f, AverageMoveTime: %f, MaxMoveTime: %f, MinMoveTime: %f, TotalMoveTime: %f\n", time.movetime, time.avgmovetime, time.maxmovetime, time.minmovetime,time.totalmovetime);
-    printf("DensityTime: %f, AverageDensityTime: %f, MaxDensityTime: %f, MinDensityTime: %f, totalDensityTime: %f\n", time.densitytime, time.avgdensitytime, time.maxdensitytime, time.mindensitytime,time.totaldensitytime);
-    printf("IterativeTime: %f, AverageIterativeTime: %f, MaxIterativeTime: %f, MinIterativeTime: %f, totalIterativeTime: %f\n", time.iterativetime, time.avgiterativetime, time.maxiterativetime, time.miniterativetime,time.totaliterativetime);
-    printf("ForceTime: %f, AverageForceTime: %f, MaxForceTime: %f, MinForceTime: %f, TotalForceTime: %f\n", time.forcetime, time.avgforcetime, time.maxforcetime, time.minforcetime,time.totalforcetime);
+    printf("MoveTime: %f, AverageMoveTime: %f, MaxMoveTime: %f, MinMoveTime: %f\n", time.movetime, time.avgmovetime, time.maxmovetime, time.minmovetime);
+    printf("DensityTime: %f, AverageDensityTime: %f, MaxDensityTime: %f, MinDensityTime: %f\n", time.densitytime, time.avgdensitytime, time.maxdensitytime, time.mindensitytime);
+    printf("IterativeTime: %f, AverageIterativeTime: %f, MaxIterativeTime: %f, MinIterativeTime: %f\n", time.iterativetime, time.avgiterativetime, time.maxiterativetime, time.miniterativetime);
+    printf("ForceTime: %f, AverageForceTime: %f, MaxForceTime: %f, MinForceTime: %f\n", time.forcetime, time.avgforcetime, time.maxforcetime, time.minforcetime);
+
 
     fout.close();
 }

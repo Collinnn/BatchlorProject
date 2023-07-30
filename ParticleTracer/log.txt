@@ -1,0 +1,229 @@
+Max number of threads is 1 
+cell width is 0.100000 
+cell height is 0.100000 
+physical width is 10.000000 
+physical height is 10.000000 
+width is 100 
+height is 100 
+Construct particle 0xb05140 
+Construct 0x7f01bb7ab010 
+Construct 0x7f01bb009010 
+Construct 0x7f01ba867010 
+Construct 0x7f01ba0be010 
+Construct 0x7f01b9915010 
+construct 0x7ffe4fedf778 poissonSolver 
+i is 0 
+size is 100 
+i is 1 
+size is 100 
+i is 2 
+size is 100 
+i is 3 
+size is 100 
+i is 4 
+size is 100 
+i is 5 
+size is 100 
+i is 6 
+size is 100 
+i is 7 
+size is 100 
+i is 8 
+size is 100 
+i is 9 
+size is 100 
+i is 10 
+size is 100 
+i is 11 
+size is 100 
+i is 12 
+size is 100 
+i is 13 
+size is 100 
+i is 14 
+size is 100 
+i is 15 
+size is 100 
+i is 16 
+size is 100 
+i is 17 
+size is 100 
+i is 18 
+size is 100 
+i is 19 
+size is 100 
+i is 20 
+size is 100 
+i is 21 
+size is 100 
+i is 22 
+size is 100 
+i is 23 
+size is 100 
+i is 24 
+size is 100 
+i is 25 
+size is 100 
+i is 26 
+size is 100 
+i is 27 
+size is 100 
+i is 28 
+size is 100 
+i is 29 
+size is 100 
+i is 30 
+size is 100 
+i is 31 
+size is 100 
+i is 32 
+size is 100 
+i is 33 
+size is 100 
+i is 34 
+size is 100 
+i is 35 
+size is 100 
+i is 36 
+size is 100 
+i is 37 
+size is 100 
+i is 38 
+size is 100 
+i is 39 
+size is 100 
+i is 40 
+size is 100 
+i is 41 
+size is 100 
+i is 42 
+size is 100 
+i is 43 
+size is 100 
+i is 44 
+size is 100 
+i is 45 
+size is 100 
+i is 46 
+size is 100 
+i is 47 
+size is 100 
+i is 48 
+size is 100 
+i is 49 
+size is 100 
+i is 50 
+size is 100 
+i is 51 
+size is 100 
+i is 52 
+size is 100 
+i is 53 
+size is 100 
+i is 54 
+size is 100 
+i is 55 
+size is 100 
+i is 56 
+size is 100 
+i is 57 
+size is 100 
+i is 58 
+size is 100 
+i is 59 
+size is 100 
+i is 60 
+size is 100 
+i is 61 
+size is 100 
+i is 62 
+size is 100 
+i is 63 
+size is 100 
+i is 64 
+size is 100 
+i is 65 
+size is 100 
+i is 66 
+size is 100 
+i is 67 
+size is 100 
+i is 68 
+size is 100 
+i is 69 
+size is 100 
+i is 70 
+size is 100 
+i is 71 
+size is 100 
+i is 72 
+size is 100 
+i is 73 
+size is 100 
+i is 74 
+size is 100 
+i is 75 
+size is 100 
+i is 76 
+size is 100 
+i is 77 
+size is 100 
+i is 78 
+size is 100 
+i is 79 
+size is 100 
+i is 80 
+size is 100 
+i is 81 
+size is 100 
+i is 82 
+size is 100 
+i is 83 
+size is 100 
+i is 84 
+size is 100 
+i is 85 
+size is 100 
+i is 86 
+size is 100 
+i is 87 
+size is 100 
+i is 88 
+size is 100 
+i is 89 
+size is 100 
+i is 90 
+size is 100 
+i is 91 
+size is 100 
+i is 92 
+size is 100 
+i is 93 
+size is 100 
+i is 94 
+size is 100 
+i is 95 
+size is 100 
+i is 96 
+size is 100 
+i is 97 
+size is 100 
+i is 98 
+size is 100 
+i is 99 
+size is 100 
+setGridToZero start 
+setGridToZero end 
+setGridToZero start 
+setGridToZero end 
+Time: 5.093403
+MoveTime: 0.004956, AverageMoveTime: 0.004863, MaxMoveTime: 0.008218, MinMoveTime: 0.004267
+DensityTime: 0.000000, AverageDensityTime: 0.000000, MaxDensityTime: 0.000000, MinDensityTime: 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000
+IterativeTime: 0.000000, AverageIterativeTime: 0.000000, MaxIterativeTime: 0.000000, MinIterativeTime: 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000
+ForceTime: 0.000000, AverageForceTime: 0.000000, MaxForceTime: 0.000000, MinForceTime: 179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.000000
+Hellodelete 0x7f01b9915010 
+delete 0x7f01ba0be010 
+delete 0x7f01ba867010 
+delete 0x7f01bb009010 
+delete 0x7f01bb7ab010 
+Deleted particle 0xb05140 

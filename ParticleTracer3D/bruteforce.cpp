@@ -5,13 +5,12 @@
 double G = 6.67430e-11; //Gravitational constant
 
 void gravtiationalForceUpdate(int x,particle_storage& storage){
-    particle2D input = storage[x];
+    particle3D input = storage[x];
 
     
     int size = storage.getSize();
-    //#pragma omp parallel for
     for (int i = 0; i < size; i++){
-        particle2D temp = storage[i];
+        particle3D temp = storage[i];
 
         if(input.x == temp.x && input.y == temp.y){
             continue;
@@ -29,6 +28,7 @@ void gravtiationalForceUpdate(int x,particle_storage& storage){
             double force = G*temp.weight*input.weight/(distance*distance); //Force between two particles
 
             double acceleration = force/input.weight; //Acceleration of the particle
+
             double xc = xdiff/distance; //Cosine of the angle between the two particles
             double yc = ydiff/distance; //Sine of the angle between the two particles
             input.x_delta = input.x_delta + acceleration*xc;

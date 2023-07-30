@@ -26,8 +26,8 @@ typedef struct{
 
 typedef struct{
     double totaltime;
-    double movetime, avgmovetime, maxmovetime,minmovetime;
-    double densitytime, avgdensitytime, maxdensitytime, mindensitytime;
-    double iterativetime, avgiterativetime, maxiterativetime, miniterativetime;
-    double forcetime, avgforcetime, maxforcetime, minforcetime;
+    double movetime, avgmovetime, maxmovetime,minmovetime,totalmovetime;
+    double densitytime, avgdensitytime, maxdensitytime, mindensitytime,totaldensitytime;
+    double iterativetime, avgiterativetime, maxiterativetime, miniterativetime,totaliterativetime;
+    double forcetime, avgforcetime, maxforcetime, minforcetime,totalforcetime;
 } timeZone;

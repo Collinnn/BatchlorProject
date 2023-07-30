@@ -1,4 +1,0 @@
-
-
-//Gravitational potential 
-//Gravitational Force
